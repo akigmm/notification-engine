@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd
+        ">
+
+	<context:component-scan base-package="org.notificationengine"/>
+
+    <mvc:annotation-driven/>
+            
+    <bean id="viewResolver"
+	      class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+	    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+	    <property name="prefix" value="/WEB-INF/jsp/"/>
+	    <property name="suffix" value=".jsp"/>
+	</bean>
+    
+    <context:property-placeholder location="classpath:localsettings.properties" ignore-unresolvable="true" />
+    
+    <util:properties id="localSettingsProperties" location="classpath:localsettings.properties"/>
+    
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+	  <property name="host" value="${smtp.host}"/>
+	  <property name="port" value="${smtp.port}"/>
+	  <property name="username" value="${smtp.username}"/>
+	  <property name="password" value="${smtp.password}"/>
+	  <property name="javaMailProperties">
+	  	<props>
+	      <prop key="mail.smtp.auth">${smtp.auth}</prop>
+	      <prop key="mail.smtp.starttls.enable">${smtp.starttls.enable}</prop>
+	      <prop key="mail.smtp.timeout">${smtp.timeout}</prop>
+	  	</props>
+	  </property>
+	</bean>
+	
+	<bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage">
+	  <property name="from" value="${mail.from}"/>
+	  <property name="subject" value="${mail.subject}"/>
+	</bean>
+
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
+    </bean>
+
+    <mvc:resources mapping="/resources/**" location="file:${resources.folder}"/>
+    <mvc:resources mapping="/admin/**" location="/WEB-INF/console-admin/" />
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/*.do*"/>
+            <mvc:exclude-mapping path="/login.do"/>
+            <mvc:exclude-mapping path="/resources/**"/>
+            <bean class="org.notificationengine.web.interceptor.TokenInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider ref="adAuthenticationProvider" />
+    </security:authentication-manager>
+
+    <bean id="adAuthenticationProvider"
+          class="org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider">
+        <constructor-arg value="${activedirectory.domain}" />
+        <constructor-arg value="${activedirectory.ldap.url}" />
+    </bean>
+
+    <bean id="contextSource"
+          class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+        <constructor-arg value="${context.source.url}"/>
+        <property name="userDn" value="${context.source.userdn}"/>
+        <property name="password" value="${context.source.password}"/>
+    </bean>
+
+    <bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
+        <constructor-arg ref="contextSource" />
+        <property name="ignorePartialResultException" value="true" />
+    </bean>
+
+
+</beans>

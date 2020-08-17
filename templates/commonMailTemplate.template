@@ -1,0 +1,21 @@
+<p>Dear {{displayName}}</p>
+
+<p>This mail has been sent by Notification application.</p>
+
+<ul>
+{{#topics}}
+
+<li><h2>{{topic}}</h2>
+
+{{#notificationsForTopic}}
+
+<p>{{{content}}}</p>
+
+{{/notificationsForTopic}}
+</li>
+{{/topics}}
+</ul>
+
+<p>Best regards,</p>
+
+<p>Notification Team</p>
