@@ -1420,23 +1420,3 @@ Property "jdbc.sql.topic.param=topic" is the name of the parameter used for subs
 
 Note that if you use a database different than hsqldb, you will have to add the dependency in the pom.xml. 
 
-# 6. Admin console
-
-An admin console has been created to use the REST API of the NotificationEngine. The source code is hosted on a [GitHub repo](https://github.com/matthis-d/NotificationEngine-front). 
-
-The built of this admin console is placed in the folder ```src/main/webapp/WEB-INF/console-admin``` of the NotificationEngine. In that way, when you start the NotificationEngine, by default, it shows the admin console.
-
-# 7. Unit tests
-
-We tried to add some unit tests to our Notification Engine.
-Some of them need a MongoDB instance running on localhost, on port 27017.
-This instance should contain a database named notificationengine_test, with collections rawnotifications, decoratednotifications and subscriptions.
-This is not very "state of the art", please be indulgent :)
-
-# 8. Roadmap
-
-We use the issues of GitHub to define the new features we plan to implement.
-
-We also use it to list the bugs we find.
-
-Feel free to contribute, and we would really welcome any of your suggestions for improving the Notification Engine.
